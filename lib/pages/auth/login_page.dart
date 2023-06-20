@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -119,19 +120,7 @@ class _LoginPageState extends State<LoginPage> {
 
   TextButton signInButton() {
     return TextButton(
-      onPressed: () async {
-        if (formkey.currentState!.validate()) {
-          formkey.currentState!.save();
-          try {
-            final userResult = await firebaseAuth.signInWithEmailAndPassword(
-                email: email, password: password);
-            Navigator.pushReplacementNamed(context, "/homePage");
-            print(userResult.user!.email);
-          } catch (e) {
-            print(e.toString());
-          }
-        } else {}
-      },
+      onPressed: signIn,
       child: Container(
         height: 50,
         width: 150,
@@ -149,6 +138,25 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void signIn() async {
+    if (formkey.currentState!.validate()) {
+      formkey.currentState!.save();
+      final result = await authService.signIn(email, password);
+      if (result == "success") {
+        Navigator.pushReplacementNamed(context, "/homePage");
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: Text("HATA"),
+                content: Text(result!),
+              );
+            });
+      }
+    }
+  }
+
   CustomTextButton signUpButton() {
     return CustomTextButton(
       onPressed: () {
@@ -160,7 +168,19 @@ class _LoginPageState extends State<LoginPage> {
 
   TextButton forgotPasswordButton() {
     return TextButton(
-      onPressed: () {},
+      onPressed: () async {
+        final result = await authService.forgotPassword;
+        if (result != null) {
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text("email kontrol et "),
+          //   ),
+          // );
+          Navigator.pushNamed(context, "/forgotPage");
+        } else {
+          print("hata var");
+        }
+      },
       child: Text(
         "Sifremi Unuttum",
         style: TextStyle(color: Colors.pink.shade200),

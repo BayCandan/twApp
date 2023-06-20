@@ -2,18 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:twapp/service/auth_service.dart';
 
-class SignUp extends StatefulWidget {
-  const SignUp({super.key});
+class forgotPage extends StatefulWidget {
+  const forgotPage({super.key});
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<forgotPage> createState() => _SignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
-  late String email, password;
+class _SignUpState extends State<forgotPage> {
+  late String email;
   final formkey = GlobalKey<FormState>();
   final firebaseAuth = FirebaseAuth.instance;
+  final authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,8 @@ class _SignUpState extends State<SignUp> {
                       customSizedBox(),
                       emailTextField(),
                       customSizedBox(),
-                      passwordTextField(),
+                      customSizedBox(),
+                      customSizedBox(),
                       customSizedBox(),
                       signUpButton(),
                       backToLoginPage()
@@ -62,36 +65,31 @@ class _SignUpState extends State<SignUp> {
 
   TextButton signUpButton() {
     return TextButton(
-      onPressed: signIn,
+      onPressed: () async {
+        // final result = await authService.forgotPassword(email);  // hata veren kod
+        final result = await authService.forgotPassword;
+        if (result != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("email kontrol et "),
+            ),
+          );
+          Navigator.pop(context, "/loginPage");
+        } else {
+          print("hata var");
+        }
+      },
       child: Center(
         child: Text(
-          "Hesap Olustur",
+          "Kod Gonder",
           style: TextStyle(color: Colors.pink.shade200),
         ),
       ),
     );
   }
+  
 
-  void signIn() async {
-      if (formkey.currentState!.validate()) {
-        formkey.currentState!.save();
-        try {
-          var userResult = await firebaseAuth.createUserWithEmailAndPassword(
-              email: email, password: password);
-          formkey.currentState!.reset();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  "Hesap Olusturuldu, Giris Sayfasina Yonlendirilioyrsunuz"),
-            ),
-          );
-          Navigator.pop(context, "/loginPage");
-        } catch (e) {
-          print(e.toString());
-        }
-      } else {}
-    }
-
+ 
   TextButton backToLoginPage() {
     return TextButton(
       onPressed: () => Navigator.pop(context, "/loginPage"),
@@ -104,21 +102,7 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  TextFormField passwordTextField() {
-    return TextFormField(
-      obscureText: true,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return "Bilgileri Eksiksiz Doldurun";
-        } else {}
-      },
-      onSaved: (value) {
-        password = value!;
-      },
-      style: TextStyle(color: Colors.white),
-      decoration: custominputDecoration("Sifre"),
-    );
-  }
+
 
   TextFormField emailTextField() {
     return TextFormField(
@@ -137,7 +121,7 @@ class _SignUpState extends State<SignUp> {
 
   Text tittleText() {
     return Text(
-      "Hadi, Durma, \nHemen Hesap Olustur",
+      "Hay Aksi! \nEmail'ini Yaz Halledelim",
       style: TextStyle(
           fontSize: 30, color: Colors.white, fontWeight: FontWeight.bold),
     );

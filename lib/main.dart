@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twapp/pages/auth/forgot_password.dart';
 import 'package:twapp/pages/auth/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:twapp/pages/auth/sign_up.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         "/loginPage": (context) => LoginPage(),
         "/signUp": (context) => SignUp(),
         "/homePage": (context) => HomePage(),
+        "/forgotPage":(context) => forgotPage(),
       },
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo', //02223350580 3914

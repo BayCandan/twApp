@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:twapp/pages/auth/sign_up.dart';
+import 'package:twapp/service/auth_service.dart';
 import 'package:twapp/widgets/customTextButton.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   late String email, password;
   final formkey = GlobalKey<FormState>();
   final firebaseAuth = FirebaseAuth.instance;
+  final authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +55,25 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           forgotPasswordButton(),
-                          CsignUpButton(),
+                          signUpButton(),
                         ],
                       ),
                       Center(
                         child: signInButton(),
+                      ),
+                      Center(
+                        child: CustomTextButton(
+                            onPressed: () async {
+                              final result =
+                                  await authService.signInAnonymous();
+                              if (result != null) {
+                                Navigator.pushReplacementNamed(
+                                    context, "/homePage");
+                              } else {
+                                print("hata var");
+                              }
+                            },
+                            buttonText: "Misafir Girisi"),
                       ),
                     ],
                   ),
@@ -133,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  CustomTextButton CsignUpButton() {
+  CustomTextButton signUpButton() {
     return CustomTextButton(
       onPressed: () {
         Navigator.pushNamed(context, "/signUp");
